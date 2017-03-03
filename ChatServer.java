@@ -4,9 +4,13 @@ import org.omg.CosNaming.NamingContextPackage.*; // ..for exceptions.
 import org.omg.CORBA.*;     // All CORBA applications need these classes.
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.POA;
+import java.util.*;
 
 class ChatImpl extends ChatPOA
 {
+    ArrayList<String> userList = new ArrayList<String>();
+    ArrayList<ChatCallback> connList = new ArrayList<ChatCallback>();
+
     private ORB orb;
 
     public void setORB(ORB orb_val) {
@@ -23,21 +27,63 @@ class ChatImpl extends ChatPOA
 
     public String join(ChatCallback callobj, String msg)
     {
-        callobj.callback(msg);
-        System.out.println(msg);
-        return msg;
+        int index;
+
+        if (!userList.contains(msg)){
+          if (connList.contains(callobj)){
+            index = connList.indexOf(callobj);
+            connList.remove(index);
+            userList.remove(index);
+          }
+          userList.add(msg);
+          connList.add(callobj);
+
+          callobj.callback("Welcome "+msg);
+          return "Welcome "+msg;
+        }else{
+          callobj.callback("The username "+msg+" is not available.");
+          return "The username "+msg+" is not available.";
+        }
     }
 
-    public String list(ChatCallback objref){
-      return null;
+    public String list(ChatCallback callobj){
+      String rt = "";
+
+      for(int i = 0; i < userList.size(); i++){
+        rt += userList.get(i)+"\n";
+      }
+      callobj.callback(rt);
+      return rt;
     }
 
-    public String post(ChatCallback objref, String msg){
-      return null;
+    public String post(ChatCallback callobj, String msg){
+      String username;
+      int index = connList.indexOf(callobj);
+      if (index == -1){
+        callobj.callback("You are not logged in!");
+        return "You are not logged in!";
+      }else{
+        username = userList.get(index);
+        for (int i = 0; i < connList.size(); i++){
+          connList.get(i).callback(username+": "+msg);
+        }
+        return "";
+      }
     }
 
-    public String leave(ChatCallback objref){
-      return null;
+    public String leave(ChatCallback callobj){
+      int index;
+      if (connList.contains(callobj)){
+        index = connList.indexOf(callobj);
+        connList.remove(index);
+        userList.remove(index);
+        callobj.callback("Bye!");
+        return "Bye!";
+      }else{
+        callobj.callback("You are not loged in!");
+        return "You are not logged in!";
+      }
+
     }
 }
 

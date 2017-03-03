@@ -64,20 +64,19 @@ public class ChatClient
       String command = "";
       String message = "";
       for (;;){
-        System.out.print(">");
         msg = scan.nextLine();
 
         command = msg.split(" ")[0];
-        
+
         if (command.equals("join")){
           message = msg.split(" ", 2)[1];
           chatImpl.join(cref, message);
-        }else if (command == "list"){
+        }else if (command.equals("list")){
           chatImpl.list(cref);
-        }else if (command == "post"){
+        }else if (command.equals("post")){
           message = msg.split(" ", 2)[1];
           chatImpl.post(cref, message);
-        }else if (command == "leave"){
+        }else if (command.equals("leave")){
           chatImpl.leave(cref);
         }else{
           System.out.println("bad command!");
