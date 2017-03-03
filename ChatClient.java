@@ -56,8 +56,6 @@ public class ChatClient
 	    ChatCallback cref = ChatCallbackHelper.narrow(ref);
 
 	    // Application code goes below
-	    //String chat = chatImpl.say(cref, "\n  Hello....");
-	    //System.out.println(chat);
 
       Scanner scan = new Scanner(System.in);
       String msg = "";
@@ -78,6 +76,8 @@ public class ChatClient
           chatImpl.post(cref, message);
         }else if (command.equals("leave")){
           chatImpl.leave(cref);
+        }else if (command.equals("quit")){
+            System.exit(0);
         }else{
           System.out.println("bad command!");
         }
