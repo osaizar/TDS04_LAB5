@@ -3,11 +3,11 @@ module ChatApp {
       void callback(in string message);
    };
    interface Chat {
-      string join(in ChatCallback objref, in string name);
-      string list(in ChatCallback objref);
-      string post(in ChatCallback objref, in string msg);
-      string leave(in ChatCallback objref, in boolean silent);
-      string game(in ChatCallback objref, in string color);
-      string move(in ChatCallback objref, in string msg);
+      void join(in ChatCallback objref, in string name);
+      void list(in ChatCallback objref);
+      void post(in ChatCallback objref, in string msg);
+      void leave(in ChatCallback objref, in boolean silent);
+      void game(in ChatCallback objref, in string color);
+      void move(in ChatCallback objref, in string msg);
    };
 };

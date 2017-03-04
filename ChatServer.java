@@ -21,146 +21,132 @@ class ChatImpl extends ChatPOA
     }
 
 
-    public String join(ChatCallback callobj, String msg)
-    {
-        int index;
+    public void join(ChatCallback callobj, String msg){
+      int index;
 
-        if (!userList.contains(msg)){
-          if (connList.contains(callobj)){
-            callobj.callback("You are already logged in!");
-            return "";
+      if (userList.contains(msg)){
+        callobj.callback("The username "+msg+" is not available.");
+      }else if (connList.contains(callobj)){
+        callobj.callback("You are already logged in!");
+      }else{
+        userList.add(msg);
+        connList.add(callobj);
+        playerList.add(Integer.valueOf(0)); //not a player
+
+        callobj.callback("Welcome "+msg);
+        index = connList.indexOf(callobj);
+
+        for (int i = 0; i < connList.size(); i++){
+          if(index != i){
+            connList.get(i).callback(msg+" has joined!");
           }
-          userList.add(msg);
-          connList.add(callobj);
-          playerList.add(Integer.valueOf(0)); //not a player
-
-          callobj.callback("Welcome "+msg);
-          index = connList.indexOf(callobj);
-
-          for (int i = 0; i < connList.size(); i++){
-            if(index != i){
-              connList.get(i).callback(msg+" has joined!");
-            }
-          }
-
-          return "";
-        }else{
-          callobj.callback("The username "+msg+" is not available.");
-          return "The username "+msg+" is not available.";
         }
+      }
     }
 
 
-    public String list(ChatCallback callobj){
+    public void list(ChatCallback callobj){
       String rt = "";
 
       for(int i = 0; i < userList.size(); i++){
         rt += userList.get(i)+"\n";
       }
       callobj.callback(rt);
-      return rt;
     }
 
 
-    public String post(ChatCallback callobj, String msg){
+    public void post(ChatCallback callobj, String msg){
       String username;
       int index = connList.indexOf(callobj);
       if (index == -1){
         callobj.callback("You are not logged in!");
-        return "You are not logged in!";
       }else{
         username = userList.get(index);
         for (int i = 0; i < connList.size(); i++){
           connList.get(i).callback(username+": "+msg);
         }
-        return "";
       }
     }
 
 
-    public String game(ChatCallback callobj, String msg){
+    public void game(ChatCallback callobj, String msg){
       int index = 0;
       int value = 0;
       int team  = 0;
 
       if (!connList.contains(callobj)){
         callobj.callback("You are not logged in!");
-        return "";
-      }
-      if (!msg.equals("x") && !msg.equals("o")){
+      }else if (!msg.equals("x") && !msg.equals("o")){
         callobj.callback("The color is not correct (x or o)");
-        return "";
-      }
-      if (game == null){ // new game
-        game = new Game();
-        callobj.callback("A new 5 on a row game has started!");
-      }
-      index = connList.indexOf(callobj);
-
-      if (msg.equals("x")){
-        team = 1;
       }else{
-        team = 2;
-      }
+        if (game == null){ // new game
+          game = new Game();
+          for (int i = 0; i < connList.size(); i++){
+            connList.get(i).callback("A new 5 on a row game has started!");
+          }
+          index = connList.indexOf(callobj);
 
-      playerList.set(index, Integer.valueOf(team));
-      callobj.callback("You joined "+msg+" team");
-      callobj.callback(game.getGameBoard());
-      return "";
+          if (msg.equals("x")){
+            team = 1;
+          }else{
+            team = 2;
+          }
+
+          playerList.set(index, Integer.valueOf(team));
+          callobj.callback("You joined "+msg+" team");
+          callobj.callback(game.getGameBoard());
+        }
+      }
     }
 
 
-    public String move(ChatCallback callobj, String msg){
+    public void move(ChatCallback callobj, String msg){
       int index, team, row, col, winner;
       String rt;
       String[] split;
 
       if (!connList.contains(callobj)){
         callobj.callback("You are not logged in!");
-        return "";
-      }
-      if (game == null){
+      }else if (game == null){
         callobj.callback("There is no game running");
-        return "";
-      }
-      index = connList.indexOf(callobj);
-      team = playerList.get(index);
-      if(team == 0){
-        callobj.callback("You are not on a team!");
-        return "";
-      }
-      try{
-        split = msg.split(" ");
-        row = Integer.parseInt(split[0]);
-        col = Integer.parseInt(split[1]);
-        rt = game.makeMove(team, row, col);
-        if (!rt.equals("correct")){
-          callobj.callback(rt);
-          callobj.callback(game.getGameBoard());
-          return "";
-        }
-        winner = game.getWinner();
-        for (int i = 0; i < connList.size(); i++){
-          if (playerList.get(i) != 0){
-            connList.get(i).callback(userList.get(index)+" has made a move");
-            connList.get(i).callback(game.getGameBoard());
-            if (winner != 0){// WTF
-              connList.get(i).callback("Team "+winner+" wins the game!");
+      }else{
+        index = connList.indexOf(callobj);
+        team = playerList.get(index);
+        if(team == 0){
+          callobj.callback("You are not on a team!");
+        }else{
+          try{
+            split = msg.split(" ");
+            row = Integer.parseInt(split[0]);
+            col = Integer.parseInt(split[1]);
+            rt = game.makeMove(team, row, col);
+            if (!rt.equals("correct")){
+              callobj.callback(rt);
+              callobj.callback(game.getGameBoard());
+            }else{
+              winner = game.getWinner();
+              for (int i = 0; i < connList.size(); i++){
+                if (playerList.get(i) != 0){
+                  connList.get(i).callback(userList.get(index)+" has made a move");
+                  connList.get(i).callback(game.getGameBoard());
+                  if (winner != 0){// WTF
+                    connList.get(i).callback("Team "+winner+" wins the game!");
+                  }
+                }
+              }
+              if (winner != 0){
+                game = null;
+              }
             }
+          }catch(Exception e){
+            callobj.callback("Bad input");
           }
         }
-        if (winner != 0){
-          game = null;
-        }
-        return "";
-      }catch(Exception e){mov
-        callobj.callback("Bad input");
       }
-      return "";
     }
 
 
-    public String leave(ChatCallback callobj, boolean silent){
+    public void leave(ChatCallback callobj, boolean silent){
       int index;
       String name;
       if (connList.contains(callobj)){
@@ -174,10 +160,8 @@ class ChatImpl extends ChatPOA
             connList.get(i).callback(name+" has left the chat");
           }
         }
-        return "";
       }else{
         if (!silent)callobj.callback("You are not loged in!");
-        return "You are not logged in!";
       }
     }
 }
