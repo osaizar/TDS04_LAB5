@@ -63,23 +63,33 @@ public class ChatClient
       String message = "";
       for (;;){
         msg = scan.nextLine();
+        try{
+          command = msg.split(" ")[0];
 
-        command = msg.split(" ")[0];
-
-        if (command.equals("join")){
-          message = msg.split(" ", 2)[1];
-          chatImpl.join(cref, message);
-        }else if (command.equals("list")){
-          chatImpl.list(cref);
-        }else if (command.equals("post")){
-          message = msg.split(" ", 2)[1];
-          chatImpl.post(cref, message);
-        }else if (command.equals("leave")){
-          chatImpl.leave(cref);
-        }else if (command.equals("quit")){
-            System.exit(0);
-        }else{
-          System.out.println("bad command!");
+          if (command.equals("join")){
+            message = msg.split(" ", 2)[1];
+            chatImpl.join(cref, message);
+          }else if (command.equals("list")){
+            chatImpl.list(cref);
+          }else if (command.equals("post")){
+            message = msg.split(" ", 2)[1];
+            chatImpl.post(cref, message);
+          }else if (command.equals("leave")){
+            chatImpl.leave(cref, false);
+          }else if (command.equals("game")){
+            message = msg.split(" ", 2)[1];
+            chatImpl.game(cref, message);
+          }else if (command.equals("move")){
+            message = msg.split(" ", 2)[1];
+            chatImpl.move(cref, message);
+          }else if (command.equals("quit")){
+              chatImpl.leave(cref, true);
+              System.exit(0);
+          }else{
+            System.out.println("bad command!");
+          }
+        }catch(Exception e){
+          System.out.println("Bad command format");
         }
       }
 
