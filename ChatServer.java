@@ -84,18 +84,18 @@ class ChatImpl extends ChatPOA
           for (int i = 0; i < connList.size(); i++){
             connList.get(i).callback("A new 5 on a row game has started!");
           }
-          index = connList.indexOf(callobj);
-
-          if (msg.equals("x")){
-            team = 1;
-          }else{
-            team = 2;
-          }
-
-          playerList.set(index, Integer.valueOf(team));
-          callobj.callback("You joined "+msg+" team");
-          callobj.callback(game.getGameBoard());
         }
+        index = connList.indexOf(callobj);
+
+        if (msg.equals("x")){
+          team = 1;
+        }else{
+          team = 2;
+        }
+
+        playerList.set(index, Integer.valueOf(team));
+        callobj.callback("You joined "+msg+" team");
+        callobj.callback(game.getGameBoard());
       }
     }
 
@@ -129,7 +129,7 @@ class ChatImpl extends ChatPOA
                 if (playerList.get(i) != 0){
                   connList.get(i).callback(userList.get(index)+" has made a move");
                   connList.get(i).callback(game.getGameBoard());
-                  if (winner != 0){// WTF
+                  if (winner != 0){
                     connList.get(i).callback("Team "+winner+" wins the game!");
                   }
                 }
